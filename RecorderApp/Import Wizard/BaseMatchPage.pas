@@ -1338,71 +1338,78 @@ var
   Output : TextFile;
   I, J : Integer;
   lImportValue : String;
+  lImportNotes :string;
   lSpeciesColumnTitle : String;
   lIsSavedToFile : Boolean;
 begin
-  lIsSavedToFile := False;
-  dlgSaveUnmatched.InitialDir := GetProgramDataFolder(PATH_USER_FILES);
-  if ConfirmYesNoDefaultNo(Format(ResStr_ExcludeUnmatched,[Translate(MatchRule.Name)])) = mrYes then begin
-    if dlgSaveUnmatched.Execute then
-      lIsSavedToFile := True;
+  if MatchRule.Key = MR_KEY_NAMES then
+    MatchRule.ReallocateUnmatched
+  else begin
+    lIsSavedToFile := False;
+    dlgSaveUnmatched.InitialDir := GetProgramDataFolder(PATH_USER_FILES);
+    if ConfirmYesNoDefaultNo(Format(ResStr_ExcludeUnmatched,[Translate(MatchRule.Name)])) = mrYes then begin
+      if dlgSaveUnmatched.Execute then
+        lIsSavedToFile := True;
 
-    if lIsSavedToFile then begin
-      AssignFile(Output, dlgSaveUnmatched.FileName);
-      Rewrite(Output);
-    end;
+      if lIsSavedToFile then begin
+        AssignFile(Output, dlgSaveUnmatched.FileName);
+        Rewrite(Output);
+      end;
 
-    with Settings.ImportedData do begin
-      DisableControls;
-      try
-        First;
-        tblMatch.First;
-        for I := 1 to FieldCount - 1 do begin
-          if lIsSavedToFile then begin
-            if I = 1 then
-              Write(Output, AnsiQuotedStr(Fields[I].DisplayName, '"'))
-            else
-              Write(Output, ',', AnsiQuotedStr(Fields[I].DisplayName, '"'));
-          end;
-          with Settings.ImportFile do begin
-            if (ColumnMapping.MappedType(Fields[I].FullName) <> nil) then
-              if (ColumnMapping.MappedType(Fields[I].FullName).Key = CT_KEY_SPECIES) then
-                lSpeciesColumnTitle := Fields[I].FullName;
-          end;
-        end;
-
-        if lIsSavedToFile then
-          WriteLn(Output);
-        while not tblMatch.Eof do begin
-          FindNextUnmatched(False);
-          if not tblMatch.Eof then begin
-            lImportValue := tblMatch.FieldByName(FN_IMPORT_VALUE).AsString;
-            tblMatch.Next;
-            while Locate(lSpeciesColumnTitle, lImportValue, []) do begin
-              for J := 1 to FieldCount - 1 do begin
-                if lIsSavedToFile then begin
-                  if J = 1 then
-                    Write(Output, AnsiQuotedStr(Fields[J].AsString, '"'))
-                  else
-                    Write(Output, ',', AnsiQuotedStr(Fields[J].AsString, '"'));
-                end;
-              end;
-              if lIsSavedToFile then
-                WriteLn(Output);
-              Delete;
+      with Settings.ImportedData do begin
+        DisableControls;
+        try
+          First;
+          tblMatch.First;
+          for I := 1 to FieldCount - 1 do begin
+            if lIsSavedToFile then begin
+              if I = 1 then
+                Write(Output, AnsiQuotedStr(Fields[I].DisplayName, '"'))
+              else
+                Write(Output, ',', AnsiQuotedStr(Fields[I].DisplayName, '"'));
+            end;
+            with Settings.ImportFile do begin
+              if (ColumnMapping.MappedType(Fields[I].FullName) <> nil) then
+                if (ColumnMapping.MappedType(Fields[I].FullName).Key = CT_KEY_SPECIES) then
+                  lSpeciesColumnTitle := Fields[I].FullName;
             end;
           end;
-        end;
-      Settings.RecordCount := Settings.RecordCount - MatchRule.RemoveUnmatched;
-      finally
-        EnableControls;
-        if lIsSavedToFile then
-          CloseFile(Output);
-      end; // try
-    end; // with
-    tblMatch.Requery;
-    ChangedContent;
+
+          if lIsSavedToFile then
+            WriteLn(Output);
+          while not tblMatch.Eof do begin
+            FindNextUnmatched(False);
+            if not tblMatch.Eof then begin
+              lImportValue := tblMatch.FieldByName(FN_IMPORT_VALUE).AsString;
+              tblMatch.Next;
+              while Locate(lSpeciesColumnTitle, lImportValue, []) do begin
+                for J := 1 to FieldCount - 1 do begin
+                  if lIsSavedToFile then begin
+                    if J = 1 then
+                      Write(Output, AnsiQuotedStr(Fields[J].AsString, '"'))
+                    else
+                      Write(Output, ',', AnsiQuotedStr(Fields[J].AsString, '"'));
+                  end;
+                end;
+                if lIsSavedToFile then
+                  WriteLn(Output);
+                Delete;
+              end;
+            end;
+          end;
+        Settings.RecordCount := Settings.RecordCount - MatchRule.RemoveUnmatched;
+        finally
+          EnableControls;
+          if lIsSavedToFile then
+            CloseFile(Output);
+        end; // try
+      end; // with
+    end;
   end;
+
+  tblMatch.Requery;
+  ChangedContent;
+
 end;
 
 end.

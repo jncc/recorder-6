@@ -1839,29 +1839,6 @@ begin
   Result := CheckOrFindDataItem(ACaption, AKey, ftName, ResStr_FindName);
 end;  // CheckBiotope
 
-{-------------------------------------------------------------------------------
-  checks to ensure that if there are any temp recorders then temp must be set to true
-}
-function TdmGeneralData.CheckTempSurvey(const ASurveyKey:string) : boolean;
-var
-lCountTempRecorders : integer;
-begin
-  lCountTempRecorders := 0;
-  with qryTempRecorders do begin
-     Parameters.ParamByName('SurveyKey').Value:= ASurveyKey;
-    Open;
-    if not Eof then
-      lCountTempRecorders := FieldByName('RECORDS').AsInteger;
-    close;
-  end;
-
-  If lCountTempRecorders = 0 then
-    Result := true
-  else
-    Result := false
-
-
-end;  // CheckTempSurvey
 
 {-------------------------------------------------------------------------------
   If it is a temp survey then warn if not expected licence.
@@ -1899,6 +1876,28 @@ begin
   end
 
 end;  // CheckLicence
+{-------------------------------------------------------------------------------
+  checks to ensure that if there are any temp recorders then temp must be set to true
+}
+function TdmGeneralData.CheckTempSurvey(const ASurveyKey:string) : boolean;
+var
+lCountTempRecorders : integer;
+begin
+  lCountTempRecorders := 0;
+  with qryTempRecorders do begin
+     Parameters.ParamByName('SurveyKey').Value:= ASurveyKey;
+    Open;
+    if not Eof then
+      lCountTempRecorders := FieldByName('RECORDS').AsInteger;
+    close;
+  end;
+
+  If lCountTempRecorders = 0 then
+    Result := true
+  else
+    Result := false
+
+end;  // CheckTempSurvey
 
 
 {-------------------------------------------------------------------------------

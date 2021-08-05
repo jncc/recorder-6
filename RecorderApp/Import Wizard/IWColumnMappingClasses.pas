@@ -397,6 +397,7 @@ type
     property Sequence: Integer read FSequence;
     property IsSpeciesRule: Boolean read GetIsSpeciesRule;
     function RemoveUnmatched : Integer;
+    function ReallocateUnmatched : boolean;
     property ExcludeUnmatchedProcedure: String read FExcludeUnmatchedProcedure;
   end;
 
@@ -424,7 +425,11 @@ const
   SQL_DUPLICATES =
       'SELECT SRC.Record_No, DEST.Import_Value, DEST.Match_Key FROM ' +
       '[%s] AS SRC LEFT JOIN #%s AS DEST ON SRC.[%s]' +
-      ' = DEST.Import_Value ORDER BY SRC.Record_No';
+      ' = DEST.Import_Value ' +
+      ' WHERE DEST.Match_Key <> ' +
+      ' (SELECT [DATA] FROM SETTING WHERE [NAME] = ''UnknownObs'')' +
+      ' ORDER BY SRC.Record_No';
+
   USP_RECOVERABLE_SPECIES      = 'usp_IWCheckRecoverableMatches_Species';
   USP_MATCHRECOVERED_SPECIES   = 'usp_IWMatchRecovered_Species';
   USP_MATCHCLEAR_SPECIES       = 'usp_IWMatchClear_Species';
@@ -1990,6 +1995,8 @@ end;  // TImportFile.ApplyTableRules
              associated with a multi-record parser.
           -- has a column 'Record_No INT'
           -- has a column 'Checksum INT'
+
+
 }
 procedure TImportFile.CreateImportTables;
 var
@@ -2020,6 +2027,8 @@ begin
   // Now create tables for parsers that have multiple records
   for i := 0 to FMultiRecordTableTypes.Count - 1 do
     CreateImportTable(TColumnType(FMultiRecordTableTypes[i]));
+
+
 end;  // TImportFile.CreateImportTables
 
 {-------------------------------------------------------------------------------
@@ -2816,6 +2825,12 @@ begin
   if Assigned(OnProgress) then OnProgress(Progress, True);
 end;  // TImportFile.UpdateProgress
 
+
+function TMatchRule.ReallocateUnmatched: boolean;
+begin
+  Result := true;
+  dmDatabase.RunStoredProc(ExcludeUnmatchedProcedure, []);
+end;
 
 initialization
   RegisterClasses([TColumnType, TTaxonOccurrenceDataColumnType, TLocationInfoColumnType]);

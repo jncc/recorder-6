@@ -1145,7 +1145,7 @@ object dlgOptions: TdlgOptions
       end
       object lblSetting11: TLabel
         Left = 8
-        Top = 262
+        Top = 266
         Width = 85
         Height = 13
         Caption = 'Temp Name Key  '
@@ -1196,11 +1196,25 @@ object dlgOptions: TdlgOptions
         Caption = 'Dictionary Update Block Size'
       end
       object Label1: TLabel
-        Left = 240
+        Left = 232
         Top = 360
-        Width = 80
+        Width = 50
         Height = 13
-        Caption = 'Dictionary Status'
+        Caption = 'Dictionary '
+      end
+      object lblUnknowName: TLabel
+        Left = 296
+        Top = 266
+        Width = 109
+        Height = 13
+        Caption = 'Unallocated Name Key'
+      end
+      object lbNameMatch: TLabel
+        Left = 296
+        Top = 234
+        Width = 90
+        Height = 13
+        Caption = 'Match Name Level'
       end
       object edMaster: TEdit
         Left = 168
@@ -1271,7 +1285,7 @@ object dlgOptions: TdlgOptions
       object edTempNames: TEdit
         Left = 168
         Top = 262
-        Width = 353
+        Width = 121
         Height = 21
         MaxLength = 250
         TabOrder = 8
@@ -1311,11 +1325,34 @@ object dlgOptions: TdlgOptions
         OnKeyPress = edBlockSizeKeyPress
       end
       object edStatus: TEdit
-        Left = 336
+        Left = 288
         Top = 358
         Width = 105
         Height = 21
         TabOrder = 13
+      end
+      object edUnallocated: TEdit
+        Left = 408
+        Top = 262
+        Width = 113
+        Height = 21
+        MaxLength = 250
+        TabOrder = 14
+      end
+      object edDicSequence: TEdit
+        Left = 408
+        Top = 358
+        Width = 97
+        Height = 21
+        TabOrder = 15
+      end
+      object edMatchName: TEdit
+        Left = 408
+        Top = 230
+        Width = 113
+        Height = 21
+        MaxLength = 250
+        TabOrder = 16
       end
     end
     object tsSundry: TTabSheet

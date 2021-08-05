@@ -1,6 +1,6 @@
 inherited frmSurveyDetails: TfrmSurveyDetails
-  Left = 416
-  Top = 374
+  Left = 397
+  Top = 263
   Width = 780
   Height = 395
   Caption = 'Survey Details'
@@ -103,7 +103,7 @@ inherited frmSurveyDetails: TfrmSurveyDetails
         Top = 24
         Width = 373
         Height = 281
-        ActivePage = Licence
+        ActivePage = tsGeneral
         Anchors = [akLeft, akTop, akRight, akBottom]
         TabOrder = 2
         OnChange = pcSurveyDetailsChange

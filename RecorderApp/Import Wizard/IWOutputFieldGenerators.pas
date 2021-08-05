@@ -167,6 +167,16 @@ type
     function GeneratingSQL(FieldIndex: Integer; Tables: TTableSource): String;
         override;
   end;
+ {-----------------------------------------------------------------------------
+    The text for the unparsed observer either from the Observer(s) or
+    TempObservers column                        }
+  TUnparsedObserverFieldGenerator = class(TOutputFieldGenerator)
+  public
+    function Value(Fields: Fields; FieldIndex: Integer): OLEVariant; override;
+    function GeneratingSQL(FieldIndex: Integer; Tables: TTableSource): String;
+        override;
+  end;
+
   {-----------------------------------------------------------------------------
     Individual key identifying the reviewer
     always obtained from the import file.
@@ -290,7 +300,7 @@ var
   RecordNo: Integer;
 begin
   RecordNo := Fields['Record_No'].Value;
-  
+
   if ColumnMapping.KeyIsMapped(CT_KEY_MAPMATE_KEY) then
     Result := dmDatabase.GetStoredProcOutputParam(
         'usp_ImportWizard_NextKey_MapMate',
@@ -316,12 +326,12 @@ begin
         'spNextKey',
         ['@TableName', TableRule.TableName],
         '@Key');
-end;  // TKeyFieldGenerator.Value 
+end;  // TKeyFieldGenerator.Value
 
 { ------------------------------------------------------------------------------
 }
 function TKeyFieldGenerator.GeneratingSQL(FieldIndex: Integer;
-  Tables: TTableSource): String;  
+  Tables: TTableSource): String;
 begin
   if ColumnMapping.KeyIsMapped(CT_KEY_MAPMATE_KEY) then
     Result := RecordIdKeySQL(Tables, CT_KEY_MAPMATE_KEY, CT_KEY_MAPMATE_KEY, True)
@@ -455,7 +465,7 @@ begin
     end
   else
     Result := Null;
-end;  // TSpatialReferenceFieldGenerator.Value 
+end;  // TSpatialReferenceFieldGenerator.Value
 
 { ------------------------------------------------------------------------------
 }
@@ -506,14 +516,14 @@ end;
     TLocationFieldGenerator
 ===============================================================================}
 {-------------------------------------------------------------------------------
-  Location key, either obtained from the import file or supplied 
-  by the user. 
+  Location key, either obtained from the import file or supplied
+  by the user.
 }
 function TLocationFieldGenerator.LocationKey(Fields: Fields;
     UseViceCounty: Boolean): OLEVariant;
 begin
   Result := Null;
-  
+
   if ColumnMapping.KeyIsMapped(CT_KEY_LOCATION) then
     Result := FieldValue(Fields, CT_KEY_LOCATION, FLD_DATA)
   else
@@ -526,11 +536,11 @@ begin
       and UseViceCounty
       and ColumnMapping.KeyIsMapped(CT_KEY_VICE_COUNTY_NUMBER) then
     Result := FieldValue(Fields, CT_KEY_VICE_COUNTY_NUMBER, FLD_KEY);
-end;  // TLocationFieldGenerator.LocationKey 
+end;  // TLocationFieldGenerator.LocationKey
 
 { ------------------------------------------------------------------------------
   SQL expression that gives the location key, either obtained from the import
-  file or supplied by the user. 
+  file or supplied by the user.
 }
 function TLocationFieldGenerator.LocationKeySQL(Tables: TTableSource;
     UseViceCounty: Boolean): String;
@@ -538,7 +548,7 @@ var
   MappedViceCountySQL: String;
 begin
   Result := 'NULL';
-  
+
   if ColumnMapping.KeyIsMapped(CT_KEY_LOCATION) then
     Result := FieldValueSQL(Tables, CT_KEY_LOCATION, FLD_DATA)
   else
@@ -630,7 +640,7 @@ function TLocationFieldGenerator.GeneratingSQL(FieldIndex: Integer;
       else
         Result := Tables.QualifiedField('#master', Key + '_' + FLD_DATA);
     end;
-    
+
 begin
   case FieldIndex of
     0: Result := LocationKeySQL(Tables, True);
@@ -1153,7 +1163,7 @@ end;  // TDeterminerPreferredFieldGenerator
 function TCurrentStatusFieldGenerator.GeneratingSQL(FieldIndex: Integer;
   Tables: TTableSource): String;
 begin
-   case FieldIndex of
+  case FieldIndex of
     0: Result := TransactSqlLiteral(AppSettings.UserID);
     1: Result := 'GETDATE()';
   else
@@ -1246,13 +1256,11 @@ begin
       Result := TransactSQLLiteral(UserSuppliedData.SingleDeterminerKey)
     else
       // first listed observer key
-      Result := '(SELECT n.Match_Key'
-          + ' FROM #CT_' + CT_KEY_OBSERVER + ' AS o'
-          + ' LEFT JOIN #Names AS n'
-          + ' ON n.Import_Value = o.name'
-          + ' WHERE o.Record_No = '
+       Result := '(SELECT Determiner_Key'
+          + ' FROM #CS_00000004A'
+          + ' WHERE Record_No = '
           + Tables.QualifiedField('@generated', 'Record_No')
-          + ' AND o.Position = 0)';
+          + ')'
   end
   else if ColumnMapping.KeyIsMapped(CT_KEY_TEMPOBSERVER) then
   begin
@@ -1545,7 +1553,39 @@ begin
   else
     Result := TransactSqlLiteral(UserSuppliedData.SingleObserverKey);
 end;
+{-==============================================================================
+    TObserverFieldGenerator
+===============================================================================}
+{ ------------------------------------------------------------------------------
+}
+function TUnparsedObserverFieldGenerator.Value(Fields: Fields; FieldIndex: Integer):
+    OLEVariant;
+begin
+  if ColumnMapping.KeyIsMapped(CT_KEY_OBSERVER) then
+    Result := FieldValue(Fields, CT_KEY_OBSERVER, FLD_NAME)
+  else if ColumnMapping.KeyIsMapped(CT_KEY_TEMPOBSERVER) then
+    Result := FieldValue(Fields, CT_KEY_TEMPOBSERVER, FLD_DATA)
+  else
+    Result := Null;
+end;
 
+{ ------------------------------------------------------------------------------
+}
+function TUnparsedObserverFieldGenerator.GeneratingSQL(
+    FieldIndex: Integer; Tables: TTableSource): String;
+begin
+  if ColumnMapping.KeyIsMapped(CT_KEY_OBSERVER) then
+    Result := '(SELECT distinct Observers'
+          + ' FROM #CS_00000004A'
+          + ' WHERE Record_No = '
+          + Tables.QualifiedField('@generated', 'Record_No')
+          + ')'
+
+   else if ColumnMapping.KeyIsMapped(CT_KEY_TEMPOBSERVER) then
+    Result := FieldValueSQL(Tables, CT_KEY_TEMPOBSERVER, FLD_DATA)
+  else
+    Result := 'Null';
+end;
 
 initialization
   RegisterOutputFieldGenerators(
@@ -1570,5 +1610,6 @@ initialization
        TReviewSpeciesFieldGenerator,
        TAssociatedOccurenceKeyFieldGenerator,
        TAbundanceAccuracyFieldGenerator,
-       TObserverFieldGenerator]);
+       TObserverFieldGenerator,
+       TUnparsedObserverFieldGenerator]);
 end.

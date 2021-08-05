@@ -86,7 +86,6 @@ type
     Label2: TLabel;
     Label3: TLabel;
     eUnparsed: TEdit;
-    Label4: TLabel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure bbSaveClick(Sender: TObject);
     procedure bbCancelClick(Sender: TObject);
@@ -1103,11 +1102,6 @@ begin
   ValidateValue(eSampleDate.Text <> '',ResStr_SampleDateRequired, eSampleDate);
   ValidateValue(dbcmbSampleType.Text <> '',ResStr_SampleTypeRequired,dbcmbSampleType);
   lEventKey := TfrmObservations(DrillForm).GetSurveyKeyForEvent(FEventKey);
-  // if unparsed is not blank then the survey must be marked temporary
-  if eUnparsed.text <> '' then
-    ValidateValue(dmValidation.CheckIsTemporary(lEventKey).Success,
-      ResStr_SurveyMustBeTemp,
-      eUnparsed);
   // Make sure it stays inside its survey irrespective of cascading
   with fraLocationInfo do begin
     Validate;

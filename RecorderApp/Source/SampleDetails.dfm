@@ -453,7 +453,7 @@ inherited frmSampleDetails: TfrmSampleDetails
             273)
           object Bevel4: TBevel
             Left = 4
-            Top = 12
+            Top = 20
             Width = 355
             Height = 265
             Anchors = [akLeft, akTop, akRight, akBottom]
@@ -488,21 +488,10 @@ inherited frmSampleDetails: TfrmSampleDetails
           end
           object Label3: TLabel
             Left = 12
-            Top = 161
+            Top = 121
             Width = 52
             Height = 26
-            Caption = 'Unparsed Recorders:'
-            WordWrap = True
-          end
-          object Label4: TLabel
-            Left = 12
-            Top = 128
-            Width = 313
-            Height = 26
-            Anchors = [akLeft, akTop, akRight]
-            Caption = 
-              'Used for unparsed recorders held for temporary surveys. This dat' +
-              'a must not be exported. '
+            Caption = 'Additional Recorders:'
             WordWrap = True
           end
           object ePrivateLocation: TEdit
@@ -524,7 +513,7 @@ inherited frmSampleDetails: TfrmSampleDetails
           end
           object eUnparsed: TEdit
             Left = 96
-            Top = 166
+            Top = 126
             Width = 249
             Height = 21
             MaxLength = 255

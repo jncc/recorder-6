@@ -209,6 +209,11 @@ type
     lblIW: TLabel;
     Label1: TLabel;
     edStatus: TEdit;
+    lblUnknowName: TLabel;
+    edUnallocated: TEdit;
+    edDicSequence: TEdit;
+    lbNameMatch: TLabel;
+    edMatchName: TEdit;
     procedure FormCreate(Sender: TObject);
     procedure DrawListItem(Control: TWinControl; Index: Integer;
       Rect: TRect; State: TOwnerDrawState);
@@ -1568,7 +1573,11 @@ begin
       else if rs.Fields['Name'].Value = 'TempName' then  edTempNames.text := rs.Fields[AField].Value
       else if rs.Fields['Name'].Value = 'Competency' then  edCompetency.text := rs.Fields[AField].Value
       else if rs.Fields['Name'].Value = 'BlockSize' then  edBlockSize.text := rs.Fields[AField].Value
-      else if rs.Fields['Name'].Value = 'DictStat' then  edStatus.text := rs.Fields[AField].Value;
+      else if rs.Fields['Name'].Value = 'DictStat' then  edStatus.text := rs.Fields[AField].Value
+      else if rs.Fields['Name'].Value = 'MatchName' then  edMatchName.text := rs.Fields[AField].Value
+      else if rs.Fields['Name'].Value = 'Dict Seq' then  edDicSequence.text := rs.Fields[AField].Value
+      else if rs.Fields['Name'].Value = 'UnknownObs' then  edUnallocated.text := rs.Fields[AField].Value;
+
     rs.MoveNext
   end;
   rs.close;
@@ -1622,8 +1631,12 @@ begin
     dmDatabase.ExecuteSQL(Format(sql,[edTempLicence.text,'TempLic']),false);
     dmDatabase.ExecuteSQL(Format(sql,[edTempNames.text,'TempName']),false);
     dmDatabase.ExecuteSQL(Format(sql,[edCompetency.text,'Competency']),false);
+    dmDatabase.ExecuteSQL(Format(sql,[edUnallocated.text,'UnknownObs']),false);
     dmDatabase.ExecuteSQL(Format(sql,[edBlockSize.text,'BlockSize']),false);
     dmDatabase.ExecuteSQL(Format(sql,[edStatus.text,'DictStat']),false);
+    dmDatabase.ExecuteSQL(Format(sql,[edMatchName.text,'Matchname']),false);
+    dmDatabase.ExecuteSQL(Format(sql,[edDicSequence.text,'Dict Seq']),false);
+
     if edTempLicence.text <> FTempLicence then begin
       MessageDlg(Resstr_Delay, mtWarning, [mbOk], 0);
       dmDatabase.ExecuteSQL('usp_Setting_Temp_Survey');

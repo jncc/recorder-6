@@ -194,10 +194,9 @@ resourcestring
   ResStr_SurveyNameRequired = 'A Survey Name is required for every Survey.';
   ResStr_SurveyorNameRequired = 'A Surveyor''s Name is required for every Survey.';
   ResStr_InvalidSurveyorsName = 'The Surveyor''s Name is invalid. Enter a valid name.';
-  ResStr_TempSurveyRequired = 'The survey has unparsed observer names and must be set to temporary.';
   ResStr_InvalidLicence = 'Licence is not valid for a temporary survey';
   ResStr_SurveyTypeRequired = 'A Survey Type is required for every Survey. Select one from the list.';
-
+  ResStr_TempSurveyRequired = 'This Survey contains temporary data and must remain a temporary Survey.';
   ResStr_AllowedToDateRequired =  'A Records Allowed To Date is required when the Survey is completed.' +
                                   ' Enter a date or change the Status value.';
 
@@ -467,9 +466,9 @@ var
   ValidateValue(eSurveyRunBy.Text<>'',ResStr_SurveyorNameRequired,eSurveyRunBy);
   ValidateValue(dmGeneralData.CheckName(eSurveyRunBy),ResStr_InvalidSurveyorsName,eSurveyRunBy);
   ValidateValue(dbcmbSurveyType.Text<>'',ResStr_SurveyTypeRequired,dbcmbSurveyType);
-  if dbcbTemporary.Checked then begin
-    ValidateValue(dmGeneralData.CheckLicence(vartostr(dbcmbLicence.KeyValue)),ResStr_InvalidLicence);
-  end else
+  if dbcbTemporary.Checked then
+    ValidateValue(dmGeneralData.CheckLicence(vartostr(dbcmbLicence.KeyValue)),ResStr_InvalidLicence)
+  else
     ValidateValue(dmGeneralData.CheckTempSurvey(SurveyKey),ResStr_TempSurveyRequired);
 
   SurveyDateValidate(nil);

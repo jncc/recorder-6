@@ -23,7 +23,7 @@ interface
 
 uses
   Classes, DB, ADODB, Contnrs, DBGrids, IWColumnMappingClasses, IWTableRule,
-  IWUserSuppliedData, IWSettings;
+  IWUserSuppliedData, IWSettings,dialogs;
 
 resourcestring
   ResStr_ParseAndValidate = 'Parsing and validating data...';
@@ -277,6 +277,14 @@ begin
   // Ensure the #Master table exists so we can add/remove columns.
   sql := 'IF Object_Id(''tempdb..#Master'') IS NULL'
       + #10#9'CREATE TABLE #Master (Record_No INT PRIMARY KEY)';
+  dmDatabase.ExecuteSQL(sql);
+
+  // Now create a table to hold any deleted Observers
+  sql := 'IF Object_Id(''tempdb..#CS_00000004A'') IS NULL'
+      + #10#9'CREATE TABLE #CS_00000004A(Record_No INT PRIMARY KEY,'
+      + 'Observers VARCHAR(500) COLLATE SQL_Latin1_General_CP1_CI_AS,'
+      + 'Determiner_Key CHAR(16)COLLATE SQL_Latin1_General_CP1_CI_AS )';
+
   dmDatabase.ExecuteSQL(sql);
 
   for i := 0 to FDataSource.FieldCount - 1 do
@@ -1071,6 +1079,8 @@ begin
         // Update validation flags of remaining columns.
         for i := 0 to columnsToValidate.Count - 1 do
           TColumnValidationInfo(columnsToValidate.Objects[i]).RequiresParsing := False;
+
+
       end;
     finally
       columnsToValidate.Free;
@@ -1481,6 +1491,9 @@ var
   end;
 
 begin
+  // Populates #CS_00000004A
+  dmDatabase.RunStoredProc('usp_SaveUnallocatedNames',[]);
+
   Tables := TTableSource.Create;
   try
     Columns := 'Generated_Id INT NOT NULL';
