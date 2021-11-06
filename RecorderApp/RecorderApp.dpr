@@ -323,7 +323,11 @@ uses
   AddinSearchManager in '..\Third Party\Dorset Software Services\Recorder Addins\Source\AddinSearchManager.pas',
   DSSLocalizerUtils in '..\Third Party\Dorset Software Services\Recorder Addins\Source\DSSLocalizerUtils.pas',
   ExternalSourceDetails in 'Components\ExternalSourceDetails.pas' {dlgExternalSourceDetails},
-  HierarchyFunctions in 'Source\HierarchyFunctions.pas';
+  HierarchyFunctions in 'Source\HierarchyFunctions.pas',
+  GotoAKey in 'Source\GotoAKey.pas' {dlgGotoKey},
+  GenerateRucksack in 'Source\GenerateRucksack.pas' {dlgGenerateRucksack},
+  UserAddedTaxa in 'Source\UserAddedTaxa.pas' {dlgUserAddedTaxa},
+  RestoreDBExternal in 'Source\RestoreDBExternal.pas' {dlgRestoreDBEXternal};
 
 {$R 'RecorderApp.manifest.res' 'RecorderApp.manifest.rc'}
 
@@ -405,6 +409,10 @@ begin
       dmFormActions := TdmFormActions.Create(Application);
       Application.CreateForm(TdmSearch, dmSearch);
   Application.CreateForm(TfrmMain, frmMain);
+  Application.CreateForm(TdlgGotoKey, dlgGotoKey);
+  Application.CreateForm(TdlgGenerateRucksack, dlgGenerateRucksack);
+  Application.CreateForm(TdlgUserAddedTaxa, dlgUserAddedTaxa);
+  Application.CreateForm(TdlgRestoreDBEXternal, dlgRestoreDBEXternal);
   //Init menus controlled by addins
       AppSettings.ComAddins.MainMenu := frmMain.mnuMain;
       AppSettings.ComAddins.InitialiseDynamicMenus;

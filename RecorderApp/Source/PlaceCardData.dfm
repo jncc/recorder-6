@@ -19,7 +19,7 @@ inherited dmPlaceCard: TdmPlaceCard
       'FROM SURVEY_EVENT SE'
       'Where SE.SURVEY_KEY = :Survey'
       '')
-    ParseSQL = True
+    ParseSQL = False
     Left = 268
     Top = 60
   end
